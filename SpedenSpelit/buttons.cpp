@@ -1,8 +1,10 @@
 #include "buttons.h"
-int buttonPressed;
+volatile int buttonPressed;
 bool canPress = true;
 
-
+int getLastButton(){
+  return buttonPressed;
+}
 
 void initButtonsAndButtonInterrupts(void)
 {

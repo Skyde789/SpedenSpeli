@@ -14,6 +14,15 @@ void setup()
   /*
     Initialize here all modules
   */
+
+  Serial.begin(9600);
+
+  initButtonsAndButtonInterrupts();
+  
+  initializeDisplay();
+  initializeLeds();
+  initializeTimer();
+
 }
 
 void loop()
@@ -59,5 +68,7 @@ void initializeGame()
 void startTheGame()
 {
    // see requirements for the function from SpedenSpelit.h
+   initializeGame();
+
 }
 
