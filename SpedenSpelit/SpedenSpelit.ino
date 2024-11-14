@@ -7,68 +7,114 @@
 // loop() function and interrupt handlers
 volatile int buttonNumber = -1;           // for buttons interrupt handler
 volatile bool newTimerInterrupt = false;  // for timer interrupt handler
+bool gameRunning = false;
+int timerScoreReduction = 624; // timer is 0-62499 1 second, so reduce the timer by 0.01s per point
+byte randomizedTarget = -1;
 
+unsigned int currentScore = 0;
+unsigned int topScores[4];
 
 void setup()
 {
-  /*
-    Initialize here all modules
-  */
-
   Serial.begin(9600);
-
   initButtonsAndButtonInterrupts();
-  
   initializeDisplay();
   initializeLeds();
-  initializeTimer();
-
 }
 
 void loop()
 {
-  if(buttonNumber>=0)
-  {
-     // start the game if buttonNumber == 4
-     // check the game if 0<=buttonNumber<4
-  }
+  buttonNumber = getLastButton();
 
-  if(newTimerInterrupt == true)
+  if(gameRunning)
   {
-     // new random number must be generated
-     // and corresponding let must be activated
+    if(buttonNumber>=1 && buttonNumber <= 4)
+      checkGame(buttonNumber);
+
+    if(newTimerInterrupt) 
+    {
+      randomizedTarget = random(1,5);
+      setLed(randomizedTarget);
+      newTimerInterrupt = false;
+    }
+  }
+  // Idle behaviour like showing highscores and such
+  else
+  {
+    if (buttonNumber == 6)
+      startTheGame();
   }
 }
 
 void initializeTimer(void)
 {
-	// see requirements for the function from SpedenSpelit.h
+	 // Ajastimen asetukset
+  cli();                                // Keskeytykset pois päältä asetuksen ajaksi
+  TCCR1A = 0;                           // Nollataan TCCR1A-rekisteri
+  TCCR1B = 0;                           // Nollataan TCCR1B-rekisteri
+  
+  TCCR1B |= (1 << WGM12);               // Asetetaan CTC-tila (WGM12 = 1) (Clear timer on compare match)
+                                        // B00001000 WGM12
+
+  TIMSK1 |= (1 << OCIE1A);              // Keskeytys, kun OCR1A arvo saavutetaan
+                                        // B00000010 OCR1A
+
+  TCCR1B |= B00000100;                  // Asetetaan prescaler 256           
+                                        // Eri prescalereitä                  Kuin monta kertaa timer päivittyy sekunnissa
+                                        // B00000001 1    = 16 000 000 / 1    = 16 000 000 kertaa sekunnissa
+                                        // B00000010 8    = 16 000 000 / 8    = 2 000 000 kertaa sekunnissa
+                                        // B00000011 64   = 16 000 000 / 64   = 250 000 kertaa sekunnissa
+                                        // B00000100 256  = 16 000 000 / 256  = 62 500 kertaa sekunnissa
+                                        // B00000101 1024 = 16 000 000 / 1024 = 15 264 kertaa sekunnissa
+
+  OCR1A = 62499;   
+
+  sei();                                // Keskeytykset takaisin päälle
 }
+
 ISR(TIMER1_COMPA_vect)
 {
-  /*
-  Communicate to loop() that it's time to make new random number.
-  Increase timer interrupt rate after 10 interrupts.
-  */
-  
+  // If the game is not running, leave
+  if(!gameRunning)
+    return;
+
+  newTimerInterrupt = true;
 }
 
+void LoseGame(){
+  gameRunning = false;
+  
+  // TODO Check if the current score if in the top 4 scores
+}
 
-void checkGame(byte nbrOfButtonPush)
+void checkGame(byte buttonNum)
 {
-	// see requirements for the function from SpedenSpelit.h
+  if (buttonNum == randomizedTarget)
+  {
+    currentScore++;
+    clearAllLeds();
+    //writeHighAndLowNumber(currentScore);
+
+    OCR1A = max(12500, (62499 - currentScore * timerScoreReduction));
+  }
+  else
+    LoseGame();
 }
 
 
 void initializeGame()
 {
-	// see requirements for the function from SpedenSpelit.h
+  gameRunning = true;
+  clearAllLeds();
+  randomSeed(millis());
+
+  initializeTimer();
+
+  currentScore = 0;
 }
 
 void startTheGame()
 {
-   // see requirements for the function from SpedenSpelit.h
    initializeGame();
-
 }
 
