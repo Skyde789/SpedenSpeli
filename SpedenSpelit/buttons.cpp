@@ -1,10 +1,6 @@
 #include "buttons.h"
-volatile int buttonPressed;
 bool canPress = true;
 
-int getLastButton(){
-  return buttonPressed;
-}
 
 void initButtonsAndButtonInterrupts(void)
 {
@@ -13,9 +9,30 @@ void initButtonsAndButtonInterrupts(void)
     pinMode(3,INPUT_PULLUP);
     pinMode(4,INPUT_PULLUP);
     pinMode(5,INPUT_PULLUP);
+    pinMode(6,INPUT_PULLUP);
     
     PCICR |= B00000100;
     PCMSK2 = B00111100;
+}
+
+int convert (int pin)
+{
+  if (pin == 2)
+  return 1;
+
+  if (pin == 3)
+  return 2;
+
+  if (pin == 4)
+  return 3;
+
+  if (pin == 5)
+  return 4;
+
+  if (pin == 6)
+  return 5;
+
+  return -1;
 }
 
 ISR(PCINT2_vect) {
@@ -23,25 +40,17 @@ ISR(PCINT2_vect) {
   if(canPress == false)
     return;
     
-    for(int i = 2;i<6;i++)
+    for(int i = 2;i<7;i++)
     {
         byte luettu = digitalRead(i);
         
-        /*while(digitalRead(i)==LOW)
-    {
-      //odotellaan, etta kayttaja nostaa napin
-    }*/
-        
+  
         if(luettu==LOW)
         {
-            buttonPressed = i;
+            buttonPressed = convert (i);
             canPress = false;
         }
         
     }  
-   /*
-     Here you implement logic for handling
-	 interrupts from 2,3,4,5 pins for Game push buttons
-	 and for pin 6 for start Game push button.
-   */
+   
 }
