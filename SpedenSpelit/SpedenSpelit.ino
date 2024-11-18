@@ -5,7 +5,7 @@
 
 // Use these 2 volatile variables for communicating between
 // loop() function and interrupt handlers
-volatile int buttonNumber = -1;           // for buttons interrupt handler
+volatile int buttonPressed = -1;           // for buttons interrupt handler
 volatile bool newTimerInterrupt = false;  // for timer interrupt handler
 bool gameRunning = false;
 int timerScoreReduction = 624; // timer is 0-62499 1 second, so reduce the timer by 0.01s per point
@@ -24,24 +24,23 @@ void setup()
 
 void loop()
 {
-  buttonNumber = getLastButton();
-
   if(gameRunning)
   {
-    if(buttonNumber>=1 && buttonNumber <= 4)
-      checkGame(buttonNumber);
+    if(buttonPressed>=1 && buttonPressed <= 4)
+      checkGame(buttonPressed);
 
     if(newTimerInterrupt) 
     {
       randomizedTarget = random(1,5);
       setLed(randomizedTarget);
       newTimerInterrupt = false;
+      canPress = true;
     }
   }
   // Idle behaviour like showing highscores and such
   else
   {
-    if (buttonNumber == 6)
+    if (buttonPressed == 6)
       startTheGame();
   }
 }
@@ -99,6 +98,9 @@ void checkGame(byte buttonNum)
   }
   else
     LoseGame();
+
+  buttonPressed = -1;
+  canPress = false;
 }
 
 
@@ -111,10 +113,12 @@ void initializeGame()
   initializeTimer();
 
   currentScore = 0;
+  buttonPressed = -1;
 }
 
 void startTheGame()
 {
    initializeGame();
+
 }
 
