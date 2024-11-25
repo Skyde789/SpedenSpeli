@@ -5,14 +5,14 @@
 
 // Use these 2 volatile variables for communicating between
 // loop() function and interrupt handlers
-volatile int buttonPressed = -1;           // for buttons interrupt handler
+volatile byte buttonPressed = -1;           // for buttons interrupt handler
 volatile bool newTimerInterrupt = false;  // for timer interrupt handler
 bool gameRunning = false;
 int timerScoreReduction = 624; // timer is 0-62499 1 second, so reduce the timer by 0.01s per point
 byte randomizedTarget = -1;
 
-unsigned int currentScore = 0;
-unsigned int topScores[4];
+byte currentScore = 0;
+byte topScores[4];
 
 void setup()
 {
@@ -40,7 +40,7 @@ void loop()
   // Idle behaviour like showing highscores and such
   else
   {
-    if (buttonPressed == 6)
+    if (buttonPressed == 5)
       startTheGame();
   }
 }
