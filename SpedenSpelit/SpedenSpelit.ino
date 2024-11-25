@@ -1,6 +1,7 @@
 #include "display.h"
 #include "buttons.h"
 #include "leds.h"
+#include "highscore.h"
 #include "SpedenSpelit.h"
 
 // Use these 2 volatile variables for communicating between
@@ -14,7 +15,7 @@ bool doFail = false;
 byte randomizedTarget = -1;
 
 byte currentScore = 0;
-byte topScores[4];
+
 
 void setup()
 {
@@ -102,7 +103,9 @@ void LoseGame(){
 
 void PrepareNew(){
   randomizedTarget = random(1,5);
-  setLed(randomizedTarget);
+  //setLed(randomizedTarget);
+  
+  analogWrite(randomizedTarget-1, 1023);
   newTimerInterrupt = false;
   canPress = true;
   doFail = true;
