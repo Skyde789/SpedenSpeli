@@ -18,4 +18,5 @@ byte ReadFromROM(byte);
 // Update the array of the top scores
 void GetTopScores();
 
+void SaveScores();
 #endif

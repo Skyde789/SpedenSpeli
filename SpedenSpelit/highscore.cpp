@@ -44,6 +44,8 @@ void CheckTopScore(byte score)
     }
 
     topScores[index] = score;
+
+    SaveScores();
 }
 
 // Writes a score to ROM addresses 0-3 are "top 1-4"
@@ -64,6 +66,15 @@ void GetTopScores()
 {
     for (int i=0; i < 4; i++)
     {
-       topScores[i] = ReadFromROM(i);
+      topScores[i] = ReadFromROM(i);
     }
+}
+
+void SaveScores()
+{
+    for (int i=0; i < 4; i++)
+    {
+      WriteToROM(topScores[i], i);
+    }
+
 }
