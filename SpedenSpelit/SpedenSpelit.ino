@@ -38,8 +38,6 @@ void loop()
         LoseGame();
       else
         PrepareNew();
-      
-      
     }
   }
   // Idle behaviour like showing highscores and such
@@ -133,18 +131,22 @@ void checkGame(byte buttonNum)
 void initializeGame()
 {
   gameRunning = true;
+  newTimerInterrupt = false;
   clearAllLeds();
-  randomSeed(millis());
 
+  //randomSeed(millis());
+  randomSeed(1);
   initializeTimer(true);
 
   currentScore = 0;
   buttonPressed = -1;
+
+  PrepareNew();
 }
 
 void startTheGame()
 {
-   initializeGame();
   Serial.println("Game started!");
+  initializeGame();
 }
 
