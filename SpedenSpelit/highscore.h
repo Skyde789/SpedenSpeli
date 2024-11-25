@@ -15,7 +15,7 @@ void WriteToROM(byte, byte);
 // Read a value from an address and return it
 byte ReadFromROM(byte);
 
-// Get an array of the top scores
-byte* GetTopScores();
+// Update the array of the top scores
+void GetTopScores();
 
 #endif
