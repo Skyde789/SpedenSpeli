@@ -1,6 +1,6 @@
 #include "highscore.h"
 
-
+/*
 // Receives a score, and checks if it is in the top 4 and places it accordingly
 void CheckTopScore(byte score)
 {
@@ -32,3 +32,4 @@ byte[] GetTopScores()
 
     return null;
 }
+*/

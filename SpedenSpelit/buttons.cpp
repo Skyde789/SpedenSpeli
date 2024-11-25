@@ -12,13 +12,11 @@ void initButtonsAndButtonInterrupts(void)
     pinMode(6,INPUT_PULLUP);
     
     PCICR |= B00000100;
-    PCMSK2 = B00111100;
+    PCMSK2 = B01111100;
 }
 
 int convert (int pin)
 {
-  Serial.println("Trying to convert pin");
-  Serial.print(pin);
   if (pin == 2)
   return 1;
 

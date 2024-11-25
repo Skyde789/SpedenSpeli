@@ -23,6 +23,7 @@ void setup()
   initButtonsAndButtonInterrupts();
   initializeDisplay();
   initializeLeds();
+
   Serial.println("Setup Done!");
 }
 
@@ -95,6 +96,7 @@ ISR(TIMER1_COMPA_vect)
 
 void LoseGame(){
   gameRunning = false;
+  buttonPressed = -1;
   showResult(0);
   Serial.println("Game lost!");
   initializeTimer(false);
@@ -105,7 +107,7 @@ void PrepareNew(){
   randomizedTarget = random(1,5);
   //setLed(randomizedTarget);
   
-  analogWrite(randomizedTarget-1, 1023);
+  analogWrite(randomizedTarget-1, 255);
   newTimerInterrupt = false;
   canPress = true;
   doFail = true;
@@ -115,18 +117,22 @@ void PrepareNew(){
 
 void checkGame(byte buttonNum)
 { 
-  Serial.println("Check Game");
+  Serial.print("Check Game: ");
   if (buttonNum == randomizedTarget)
   {
+    Serial.println("Correct!");
     currentScore++;
     clearAllLeds();
     showResult(currentScore);
     doFail = false;
     OCR1A = max(12500, (62499 - currentScore * timerScoreReduction));
   }
-  else
+  else{
+    Serial.println("Wrong!");
     LoseGame();
+  }
 
+  
   buttonPressed = -1;
   canPress = false;
 }
@@ -149,6 +155,7 @@ void initializeGame()
 
 void startTheGame()
 {
+  canPress = false;
   Serial.println("Game started!");
   initializeGame();
 }
