@@ -10,6 +10,7 @@ const byte lastPin =  5; // Last PinChangeInterrupt on D-bus
 
 extern volatile int buttonPressed;
 extern bool canPress;
+extern bool gameRunning;
 
 /* 
   initButtonsAndButtonInterrupts subroutine is called from Setup() function
