@@ -17,6 +17,8 @@ void initButtonsAndButtonInterrupts(void)
 
 int convert (int pin)
 {
+  Serial.println("Trying to convert pin");
+  Serial.print(pin);
   if (pin == 2)
   return 1;
 
@@ -37,7 +39,7 @@ int convert (int pin)
 
 ISR(PCINT2_vect) {
 
-  if(canPress == false)
+  if(canPress == false && gameRunning)
     return;
     
     for(int i = 2;i<7;i++)
@@ -48,7 +50,9 @@ ISR(PCINT2_vect) {
         if(luettu==LOW)
         {
             buttonPressed = convert (i);
-            canPress = false;
+            
+            if(gameRunning)
+              canPress = false;
         }
         
     }  
