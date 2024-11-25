@@ -1,7 +1,7 @@
 #ifndef HIGHSCORE_H
 #define HIGHSCORE_H
 #include <arduino.h>
-/*
+
 extern byte currentScore;
 extern byte topScores[4];
 
@@ -16,6 +16,6 @@ void WriteToROM(byte, byte);
 byte ReadFromROM(byte);
 
 // Get an array of the top scores
-byte[] GetTopScores();
-*/
+byte* GetTopScores();
+
 #endif
