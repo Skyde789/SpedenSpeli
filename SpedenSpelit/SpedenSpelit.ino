@@ -9,6 +9,8 @@ volatile byte buttonPressed = -1;           // for buttons interrupt handler
 volatile bool newTimerInterrupt = false;  // for timer interrupt handler
 bool gameRunning = false;
 int timerScoreReduction = 624; // timer is 0-62499 1 second, so reduce the timer by 0.01s per point
+bool doFail = false;
+
 byte randomizedTarget = -1;
 
 byte currentScore = 0;
@@ -31,10 +33,12 @@ void loop()
 
     if(newTimerInterrupt) 
     {
-      randomizedTarget = random(1,5);
-      setLed(randomizedTarget);
-      newTimerInterrupt = false;
-      canPress = true;
+      if (doFail)
+        LoseGame();
+      else
+        PrepareNew();
+      
+      
     }
   }
   // Idle behaviour like showing highscores and such
@@ -82,18 +86,24 @@ ISR(TIMER1_COMPA_vect)
 
 void LoseGame(){
   gameRunning = false;
-  
+  showResult(0);
   // TODO Check if the current score if in the top 4 scores
 }
-
+void PrepareNew(){
+  randomizedTarget = random(1,5);
+  setLed(randomizedTarget);
+  newTimerInterrupt = false;
+  canPress = true;
+  doFail = true;
+}
 void checkGame(byte buttonNum)
 {
   if (buttonNum == randomizedTarget)
   {
     currentScore++;
     clearAllLeds();
-    //writeHighAndLowNumber(currentScore);
-
+    showResult(currentScore);
+    doFail = false;
     OCR1A = max(12500, (62499 - currentScore * timerScoreReduction));
   }
   else
