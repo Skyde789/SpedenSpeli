@@ -22,6 +22,7 @@ void setup()
   initButtonsAndButtonInterrupts();
   initializeDisplay();
   initializeLeds();
+  Serial.println("Setup Done!");
 }
 
 void loop()
@@ -87,6 +88,7 @@ ISR(TIMER1_COMPA_vect)
 void LoseGame(){
   gameRunning = false;
   showResult(0);
+  Serial.println("Game lost!");
   // TODO Check if the current score if in the top 4 scores
 }
 void PrepareNew(){
@@ -95,6 +97,8 @@ void PrepareNew(){
   newTimerInterrupt = false;
   canPress = true;
   doFail = true;
+
+  Serial.println(randomizedTarget);
 }
 void checkGame(byte buttonNum)
 {
@@ -129,6 +133,6 @@ void initializeGame()
 void startTheGame()
 {
    initializeGame();
-
+  Serial.println("Game started!");
 }
 
