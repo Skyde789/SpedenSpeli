@@ -9,7 +9,7 @@
   give interrupts at rate 1Hz
   
 */
-void initializeTimer(void);
+void initializeTimer(bool);
 // Intoduce TIMER1_COMPA_vect Interrupt SeRvice (ISR) function for timer.
 ISR(TIMER1_COMPA_vect);
 

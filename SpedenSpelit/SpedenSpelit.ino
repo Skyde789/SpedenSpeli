@@ -50,10 +50,11 @@ void loop()
   }
 }
 
-void initializeTimer(void)
+void initializeTimer(bool on)
 {
 	 // Ajastimen asetukset
   cli();                                // Keskeytykset pois päältä asetuksen ajaksi
+  if(on){                    
   TCCR1A = 0;                           // Nollataan TCCR1A-rekisteri
   TCCR1B = 0;                           // Nollataan TCCR1B-rekisteri
   
@@ -72,7 +73,15 @@ void initializeTimer(void)
                                         // B00000101 1024 = 16 000 000 / 1024 = 15 264 kertaa sekunnissa
 
   OCR1A = 62499;   
+  }
+  else{
+    TCCR1A = 0;                        
+    TCCR1B = 0; 
 
+    TIMSK1 = 0;
+
+    OCR1A = 0;
+  }
   sei();                                // Keskeytykset takaisin päälle
 }
 
@@ -89,8 +98,10 @@ void LoseGame(){
   gameRunning = false;
   showResult(0);
   Serial.println("Game lost!");
+  initializeTimer(false);
   // TODO Check if the current score if in the top 4 scores
 }
+
 void PrepareNew(){
   randomizedTarget = random(1,5);
   setLed(randomizedTarget);
@@ -100,8 +111,10 @@ void PrepareNew(){
 
   Serial.println(randomizedTarget);
 }
+
 void checkGame(byte buttonNum)
-{
+{ 
+  Serial.println("Check Game");
   if (buttonNum == randomizedTarget)
   {
     currentScore++;
@@ -117,14 +130,13 @@ void checkGame(byte buttonNum)
   canPress = false;
 }
 
-
 void initializeGame()
 {
   gameRunning = true;
   clearAllLeds();
   randomSeed(millis());
 
-  initializeTimer();
+  initializeTimer(true);
 
   currentScore = 0;
   buttonPressed = -1;
