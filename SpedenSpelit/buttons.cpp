@@ -47,7 +47,7 @@ ISR(PCINT2_vect) {
   
         if(luettu==LOW)
         {
-            buttonPressed = convert (i);
+            buttonPressed = convert(i);
             
             if(gameRunning)
               canPress = false;

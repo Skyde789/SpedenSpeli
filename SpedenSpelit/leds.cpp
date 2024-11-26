@@ -1,8 +1,8 @@
-#include "LEDControl.h"
+#include "leds.h"
 
 int lastLedIndex = -1;
 
-void setupLeds() {
+void initializeLeds() {
   for (int i = 0; i < ledCount; i++) {
     pinMode(ledPins[i], OUTPUT);
     digitalWrite(ledPins[i], LOW);
@@ -10,6 +10,8 @@ void setupLeds() {
 }
 
 void setLed(byte index) {
+  index--;
+
   if (index >= 0 && index < ledCount) {
     if (lastLedIndex != -1) {
       digitalWrite(ledPins[lastLedIndex], LOW);

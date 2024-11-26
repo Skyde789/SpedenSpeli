@@ -25,13 +25,13 @@ void writeHighAndLowNumber(uint8_t tens,uint8_t ones)
 
 void showResult(byte number)
 {
-int tens = 0;
-int ones = 0;
+  int tens = 0;
+  int ones = 0;
 
-while(number >= 10){
-  tens++; // tens = tens + 1; TAI tens += 1;
-  number -= 10; // number = number - 10;
-}
+  while(number >= 10){
+    tens++;       
+    number -= 10; 
+  }
 
   ones = number;
 

@@ -3,27 +3,27 @@
 #include "leds.h"
 #include "highscore.h"
 #include "SpedenSpelit.h"
-
+#include "sounds.h"
 // Use these 2 volatile variables for communicating between
 // loop() function and interrupt handlers
 volatile byte buttonPressed = -1;           // for buttons interrupt handler
-volatile bool newTimerInterrupt = false;  // for timer interrupt handler
+volatile bool gameTimerReady = false;  // for timer interrupt handler
 bool gameRunning = false;
 int timerScoreReduction = 624; // timer is 0-62499 1 second, so reduce the timer by 0.01s per point
 bool doFail = false;
 
 byte randomizedTarget = -1;
-
 byte currentScore = 0;
-
 
 void setup()
 {
   Serial.begin(9600);
+
   initButtonsAndButtonInterrupts();
   initializeDisplay();
   initializeLeds();
 
+  UpdateScores();
   Serial.println("Setup Done!");
 }
 
@@ -34,7 +34,7 @@ void loop()
     if(buttonPressed>=1 && buttonPressed <= 4)
       checkGame(buttonPressed);
 
-    if(newTimerInterrupt) 
+    if(gameTimerReady) 
     {
       if (doFail)
         LoseGame();
@@ -54,27 +54,21 @@ void initializeTimer(bool on)
 {
 	 // Ajastimen asetukset
   cli();                                // Keskeytykset pois päältä asetuksen ajaksi
-  if(on){                    
-  TCCR1A = 0;                           // Nollataan TCCR1A-rekisteri
-  TCCR1B = 0;                           // Nollataan TCCR1B-rekisteri
+  if(on)
+  {                    
+    TCCR1A = 0;                           // Nollataan TCCR1A-rekisteri
+    TCCR1B = 0;                           // Nollataan TCCR1B-rekisteri
   
-  TCCR1B |= (1 << WGM12);               // Asetetaan CTC-tila (WGM12 = 1) (Clear timer on compare match)
-                                        // B00001000 WGM12
+    TCCR1B |= (1 << WGM12);               // Asetetaan CTC-tila (WGM12 = 1) (Clear timer on compare match)
 
-  TIMSK1 |= (1 << OCIE1A);              // Keskeytys, kun OCR1A arvo saavutetaan
-                                        // B00000010 OCR1A
+    TIMSK1 |= (1 << OCIE1A);              // Keskeytys, kun OCR1A arvo saavutetaan
 
-  TCCR1B |= B00000100;                  // Asetetaan prescaler 256           
-                                        // Eri prescalereitä                  Kuin monta kertaa timer päivittyy sekunnissa
-                                        // B00000001 1    = 16 000 000 / 1    = 16 000 000 kertaa sekunnissa
-                                        // B00000010 8    = 16 000 000 / 8    = 2 000 000 kertaa sekunnissa
-                                        // B00000011 64   = 16 000 000 / 64   = 250 000 kertaa sekunnissa
-                                        // B00000100 256  = 16 000 000 / 256  = 62 500 kertaa sekunnissa
-                                        // B00000101 1024 = 16 000 000 / 1024 = 15 264 kertaa sekunnissa
+    TCCR1B |= B00000100;                  // Asetetaan prescaler 256           
 
-  OCR1A = 62499;   
+    OCR1A = 62499;   
   }
-  else{
+  else
+  {
     TCCR1A = 0;                        
     TCCR1B = 0; 
 
@@ -82,48 +76,52 @@ void initializeTimer(bool on)
 
     OCR1A = 0;
   }
+
   sei();                                // Keskeytykset takaisin päälle
 }
 
 ISR(TIMER1_COMPA_vect)
 {
-  // If the game is not running, leave
-  if(!gameRunning)
-    return;
-
-  newTimerInterrupt = true;
+  gameTimerReady = true;
 }
 
 void LoseGame(){
   gameRunning = false;
   buttonPressed = -1;
+
+  clearAllLeds();
   showResult(0);
-  Serial.println("Game lost!");
   initializeTimer(false);
-  // TODO Check if the current score if in the top 4 scores
+
+  GameOverSound();
+  Serial.println("Game lost!");
+  
+  CheckIfTopScore(currentScore);
 }
 
 void PrepareNew(){
   randomizedTarget = random(1,5);
-  //setLed(randomizedTarget);
-  
-  analogWrite(randomizedTarget-1, 255);
-  newTimerInterrupt = false;
-  canPress = true;
-  doFail = true;
-
   Serial.println(randomizedTarget);
+  setLed(randomizedTarget);
+
+  gameTimerReady = false;
+  doFail = true;
+  
+  buttonPressed = -1;
+  canPress = true;
+  
 }
 
 void checkGame(byte buttonNum)
 { 
   Serial.print("Check Game: ");
+  clearAllLeds();
   if (buttonNum == randomizedTarget)
   {
     Serial.println("Correct!");
     currentScore++;
-    clearAllLeds();
     showResult(currentScore);
+
     doFail = false;
     OCR1A = max(12500, (62499 - currentScore * timerScoreReduction));
   }
@@ -132,30 +130,27 @@ void checkGame(byte buttonNum)
     LoseGame();
   }
 
-  
   buttonPressed = -1;
   canPress = false;
 }
 
 void initializeGame()
 {
+  canPress = false;
   gameRunning = true;
-  newTimerInterrupt = false;
-  clearAllLeds();
-
-  //randomSeed(millis());
-  randomSeed(1);
-  initializeTimer(true);
-
+  gameTimerReady = false;
   currentScore = 0;
   buttonPressed = -1;
 
+  clearAllLeds();
+  randomSeed(millis());
+  initializeTimer(true);
   PrepareNew();
 }
 
 void startTheGame()
 {
-  canPress = false;
+  GameStartSound();
   Serial.println("Game started!");
   initializeGame();
 }

@@ -37,24 +37,6 @@ void initializeDisplay(void);
 
 
 /*
-  WriteByte subroutine writes number 0,1,...,9 to
-  7-segment display. If there are many 7-segment
-  displays cascaded, last parameter can be used to
-  control when number is actually shown at the outputs of
-  display element.
-  
-  Parameters:
-  uint8_t number: accepts values 0,1,..,9
-  
-  bool last: either true or false. True = number is displayed
-  at the output, false is used if this function is called
-  multiple times to write all cascaded numbers to 7-segment
-  displays.
-*/
-void writeByte(uint8_t number, bool last);
-
-
-/*
   writeHighAndLowNumber subroutine writes a number 0,1,..,99
   to 2 cascaded 7-segment displays. This subroutine uses
   WriteByte subroutine to write 2 numbers to the display.
