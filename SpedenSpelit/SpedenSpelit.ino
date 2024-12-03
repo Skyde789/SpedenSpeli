@@ -7,16 +7,16 @@
 // Use these 2 volatile variables for communicating between
 // loop() function and interrupt handlers
 volatile byte buttonPressed = -1;           // for buttons interrupt handler
-volatile bool gameTimerReady = false;  // for timer interrupt handler
+volatile bool gameTimerReady = false;       // for timer interrupt handler
 bool gameRunning = false;
 int timerScoreReduction = 624; // timer is 0-62499 1 second, so reduce the timer by 0.01s per point
-bool doFail = false;
+bool doFail = false; // if true when newTimerReady -> lose the game
 
-unsigned long test;
-int showScoreDelay = 0;
-int i = 0;
-byte randomizedTarget = -1;
-byte currentScore = 0;
+unsigned long showScoreTime; // millis() handling
+int showScoreDelay = 0; // how long do we show the highscores
+int i = 0; // highscore index
+byte randomizedTarget = -1; // target button / led number
+byte currentScore = 0; 
 
 void setup()
 {
@@ -28,7 +28,7 @@ void setup()
 
   UpdateScores();
   Serial.println("Setup Done!");
-  test = 0;
+  showScoreTime = 0;
 
  
 }
@@ -54,7 +54,7 @@ void loop()
   {
     if (buttonPressed == 5)
       startTheGame();
-    if (millis() - test >= showScoreDelay){
+    if (millis() - showScoreTime >= showScoreDelay){
       ShowHighScore();
     }
    
@@ -72,7 +72,7 @@ void ShowHighScore()
   i++;
   if (i > 3)
     i = 0;
-  test = millis();
+  showScoreTime = millis();
 }
 
 void initializeTimer(bool on)

@@ -15,10 +15,12 @@ void WriteToROM(byte, byte);
 // Read a value from an address and return it
 byte ReadFromROM(byte);
 
+// Returns a score from topScores[] with the correct index given
 byte GetScore(int);
 
 // Update the array of the top scores
 void UpdateScores();
 
+// Save ALL of the scores to ROM
 void SaveScores();
 #endif
