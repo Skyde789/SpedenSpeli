@@ -23,7 +23,7 @@ byte topScores[4];
 // topScores[index] = score;
 // 40 = 45
 // 50, 45, 40, 23
-void CheckIfTopScore(byte score)
+bool CheckIfTopScore(byte score)
 {
     int index = -1;
 
@@ -35,7 +35,7 @@ void CheckIfTopScore(byte score)
     }
 
     if (index == -1)
-        return;
+        return false;
 
     int reversingIndex = 3;
 
@@ -48,7 +48,7 @@ void CheckIfTopScore(byte score)
     topScores[index] = score;
 
     SaveScores();
-    
+    return true;
 }
 
 // Writes a score to ROM addresses 0-3 that are the "top 1-4"
@@ -69,7 +69,7 @@ void UpdateScores()
 {
     for (int i=0; i < 4; i++)
     {
-      topScores[i] = ReadFromROM(i);
+      topScores[i] = ReadFromROM(i) == 255 ? 0 : ReadFromROM(i);
     }
 }
 
@@ -80,4 +80,9 @@ void SaveScores()
       WriteToROM(topScores[i], i);
     }
 
+}
+
+byte GetScore(int position)
+{
+  return topScores[position];
 }

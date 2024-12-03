@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-const byte ledPins[] = {A2, A3, A4, A5};
+const byte ledPins[] = {A0, A1, A2, A3};
 const int ledCount = sizeof(ledPins) / sizeof(ledPins[0]);
 
 // Funktiot

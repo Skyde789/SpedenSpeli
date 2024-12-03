@@ -11,7 +11,6 @@ void initializeLeds() {
 
 void setLed(byte index) {
   index--;
-
   if (index >= 0 && index < ledCount) {
     if (lastLedIndex != -1) {
       digitalWrite(ledPins[lastLedIndex], LOW);
@@ -50,12 +49,12 @@ void show1() {
 }
 
 void show2() {
-  int delayTime = 200;
+  int delayTime = 100;
   for (int cycle = 0; cycle < 10; cycle++) {
     for (int i = 0; i < ledCount; i++) {
-      for (int j = 0; j <= i; j++) {
-        digitalWrite(ledPins[j], HIGH);
-      }
+
+      digitalWrite(ledPins[i], HIGH);
+      tone(7, (350 + i * 100), (1000 / 8));
       delay(delayTime);
       clearAllLeds();
     }

@@ -12,6 +12,9 @@ bool gameRunning = false;
 int timerScoreReduction = 624; // timer is 0-62499 1 second, so reduce the timer by 0.01s per point
 bool doFail = false;
 
+unsigned long test;
+int showScoreDelay = 0;
+int i = 0;
 byte randomizedTarget = -1;
 byte currentScore = 0;
 
@@ -25,12 +28,16 @@ void setup()
 
   UpdateScores();
   Serial.println("Setup Done!");
+  test = 0;
+
+ 
 }
 
 void loop()
 {
   if(gameRunning)
   {
+
     if(buttonPressed>=1 && buttonPressed <= 4)
       checkGame(buttonPressed);
 
@@ -47,7 +54,25 @@ void loop()
   {
     if (buttonPressed == 5)
       startTheGame();
+    if (millis() - test >= showScoreDelay){
+      ShowHighScore();
+    }
+   
   }
+}
+
+void ShowHighScore()
+{
+  if (gameRunning)
+    return;
+
+  showScoreDelay = 5000;
+  showResult(GetScore(i));
+  setLed(i+1);
+  i++;
+  if (i > 3)
+    i = 0;
+  test = millis();
 }
 
 void initializeTimer(bool on)
@@ -88,28 +113,31 @@ ISR(TIMER1_COMPA_vect)
 void LoseGame(){
   gameRunning = false;
   buttonPressed = -1;
+  i = 0;
 
-  clearAllLeds();
-  showResult(0);
-  initializeTimer(false);
-
-  GameOverSound();
   Serial.println("Game lost!");
+  clearAllLeds();
+  initializeTimer(false);
+ 
+  GameOverSound();
+ 
   
-  CheckIfTopScore(currentScore);
+  if (CheckIfTopScore(currentScore))
+  {
+    show2();
+  }
 }
 
 void PrepareNew(){
   randomizedTarget = random(1,5);
   Serial.println(randomizedTarget);
   setLed(randomizedTarget);
-
+  LedPopSound(currentScore);
   gameTimerReady = false;
   doFail = true;
   
   buttonPressed = -1;
   canPress = true;
-  
 }
 
 void checkGame(byte buttonNum)
@@ -137,20 +165,24 @@ void checkGame(byte buttonNum)
 void initializeGame()
 {
   canPress = false;
-  gameRunning = true;
+
   gameTimerReady = false;
   currentScore = 0;
   buttonPressed = -1;
-
-  clearAllLeds();
   randomSeed(millis());
+ 
   initializeTimer(true);
   PrepareNew();
 }
 
 void startTheGame()
 {
+  clearAllLeds();
+  showResult(0);
   GameStartSound();
+  gameRunning = true;
+  delay(1000);
+
   Serial.println("Game started!");
   initializeGame();
 }

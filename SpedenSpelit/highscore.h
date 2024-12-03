@@ -6,7 +6,7 @@ extern byte currentScore;
 extern byte topScores[4];
 
 // Receives a score, and checks if it is in the top 4 and places it accordingly
-void CheckIfTopScore(byte);
+bool CheckIfTopScore(byte);
 
 // Writes a score to ROM addresses 0-3 are "top 1-4"
 // Receives a score and an address
@@ -14,6 +14,8 @@ void WriteToROM(byte, byte);
 
 // Read a value from an address and return it
 byte ReadFromROM(byte);
+
+byte GetScore(int);
 
 // Update the array of the top scores
 void UpdateScores();

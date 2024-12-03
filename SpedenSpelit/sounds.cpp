@@ -15,6 +15,11 @@ void GameStartSound()
 
   PlaySound(sound, duration, 8);
 }
+void LedPopSound(byte score){
+  int sound[] = {200 + (2 * score)};
+  int duration[] = {8};
+  PlaySound(sound, duration, 1);
+}
 
 void PlaySound(int* sound, int* duration, int length){
   // iterate over the notes of the melody:
@@ -25,14 +30,14 @@ void PlaySound(int* sound, int* duration, int length){
     // divided by the note type.
     //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
     int noteDuration = 1000 / duration[i];
-    tone(8, sound[i], noteDuration);
+    tone(soundPin, sound[i], noteDuration);
 
     // to distinguish the notes, set a minimum time between them.
     // the note's duration + 30% seems to work well:
     int pauseBetweenNotes = noteDuration * 1.30;
     delay(pauseBetweenNotes);
     // stop the tone playing:
-    noTone(8);
+    noTone(soundPin);
   }
   
 }
