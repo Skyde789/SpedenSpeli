@@ -1,7 +1,5 @@
 #include "leds.h"
 
-int lastLedIndex = -1;
-
 void initializeLeds() {
   for (int i = 0; i < ledCount; i++) {
     pinMode(ledPins[i], OUTPUT);
@@ -11,27 +9,20 @@ void initializeLeds() {
 
 void setLed(byte index) {
   index--;
-  if (index >= 0 && index < ledCount) {
-    if (lastLedIndex != -1) {
-      digitalWrite(ledPins[lastLedIndex], LOW);
-    }
-    digitalWrite(ledPins[index], HIGH);
-    lastLedIndex = index;
-  }
+  clearAllLeds();
+  digitalWrite(ledPins[index], HIGH);
 }
 
 void clearAllLeds() {
   for (int i = 0; i < ledCount; i++) {
     digitalWrite(ledPins[i], LOW);
   }
-  lastLedIndex = -1;
 }
 
 void setAllLeds() {
   for (int i = 0; i < ledCount; i++) {
     digitalWrite(ledPins[i], HIGH);
   }
-  lastLedIndex = -1;
 }
 
 void show1() {

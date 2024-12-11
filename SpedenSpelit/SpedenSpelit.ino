@@ -122,12 +122,15 @@ void LoseGame(){
   
   if (CheckIfTopScore(currentScore))
     show2();
-
 }
 
 void PrepareNew()
 {
   clearAllLeds();
+
+  if(gameIndex >= 100)
+    return;
+
   Serial.println(targetLeds[gameIndex]);
   setLed(targetLeds[gameIndex]);
   LedPopSound(gameIndex);
@@ -144,6 +147,7 @@ void checkGame(byte buttonNum)
   {
     Serial.println("Correct!");
     currentScore++;
+    playerIndex++;
     showResult(currentScore);
   }
   else{
@@ -169,6 +173,9 @@ void initializeGame()
   for(int i = 0; i < 100; i++)
   {
     targetLeds[i] = random(1,5);
+    if(i > 0)
+      while(targetLeds[i] == targetLeds[i-1])
+        targetLeds[i] = random(1,5);
   }
 
   initializeTimer(true);
