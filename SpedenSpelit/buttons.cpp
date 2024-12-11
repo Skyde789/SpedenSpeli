@@ -17,42 +17,19 @@ void initButtonsAndButtonInterrupts(void)
 
 int convert (int pin)
 {
-  if (pin == 2)
-  return 1;
-
-  if (pin == 3)
-  return 2;
-
-  if (pin == 4)
-  return 3;
-
-  if (pin == 5)
-  return 4;
-
-  if (pin == 6)
-  return 5;
-
-  return -1;
+  return (pin-1) > 0 ? (pin-1) : -1;
 }
 
 ISR(PCINT2_vect) {
-
-  if(canPress == false && gameRunning)
-    return;
-    
-    for(int i = 2;i<7;i++)
+  for(int i = 2;i<7;i++)
+  {
+    byte luettu = digitalRead(i);
+    if(luettu==LOW)
     {
-        byte luettu = digitalRead(i);
-        
-  
-        if(luettu==LOW)
-        {
-            buttonPressed = convert(i);
+      buttonPressed = convert(i);
             
-            if(gameRunning)
-              canPress = false;
-        }
-        
-    }  
-   
+      if(gameRunning)
+        canPress = false;
+    }
+  }  
 }

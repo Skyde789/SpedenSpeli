@@ -5,9 +5,6 @@
 #include <avr/interrupt.h>
 
 extern volatile byte buttonPressed; // Pelilogiikkaa varten talteen mitä pinniä painettiin.
-extern bool canPress; // Nappien debounce logiikka. Tätä muuttujaa käsitellään pelilogiikassa.
-extern bool gameRunning; // Onko peli päällä.
-
 /* 
   Laitetan pinnit 2-6 INPUT_PULLUP tilaan ja asetetaan rekisteristä interruptit pinneistä 2-6. 
 */

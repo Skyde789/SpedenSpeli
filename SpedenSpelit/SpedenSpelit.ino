@@ -6,16 +6,21 @@
 #include "sounds.h"
 // Use these 2 volatile variables for communicating between
 // loop() function and interrupt handlers
-volatile byte buttonPressed = -1;           // for buttons interrupt handler
-volatile bool gameTimerReady = false;       // for timer interrupt handler
+volatile byte buttonPressed = -1;          // for buttons interrupt handler
+volatile bool gameTimerReady = false;      // for timer interrupt handler
 bool gameRunning = false;
-int timerScoreReduction = 624; // timer is 0-62499 1 second, so reduce the timer by 0.01s per point
-bool doFail = false; // if true when newTimerReady -> lose the game
+int timerReduction = 624;                  // timer is 0-62499 1 second, so reduce the timer by 0.01s per point
 
-unsigned long showScoreTime; // millis() handling
-int showScoreDelay = 0; // how long do we show the highscores
-int i = 0; // highscore index
-byte randomizedTarget = -1; // target button / led number
+unsigned long millisTimer = 0;             // millis() handling
+int showScoreDelay = 0;                    // how long do we show the highscores
+int loseGameDelay = 1500;
+byte buttonInputDelay = 75;                // Every X ms check if the latest button was correct? 
+byte highScoreIndex = 0;                   // highscore index
+
+byte targetLeds[100];
+byte playerIndex = 0;
+byte gameIndex = 0;
+
 byte currentScore = 0; 
 
 void setup()
@@ -28,36 +33,29 @@ void setup()
 
   UpdateScores();
   Serial.println("Setup Done!");
-  showScoreTime = 0;
-
- 
 }
 
 void loop()
 {
   if(gameRunning)
   {
-
-    if(buttonPressed>=1 && buttonPressed <= 4)
-      checkGame(buttonPressed);
+    if (millis() - millisTimer >= buttonInputDelay)
+      if(buttonPressed>=1 && buttonPressed <= 4)
+        checkGame(buttonPressed);
 
     if(gameTimerReady) 
-    {
-      if (doFail)
-        LoseGame();
-      else
         PrepareNew();
-    }
+    
+    if (millis() - millisTimer >= loseGameDelay)
+      LoseGame();
   }
   // Idle behaviour like showing highscores and such
   else
   {
     if (buttonPressed == 5)
       startTheGame();
-    if (millis() - showScoreTime >= showScoreDelay){
+    if (millis() - millisTimer >= showScoreDelay)
       ShowHighScore();
-    }
-   
   }
 }
 
@@ -67,12 +65,12 @@ void ShowHighScore()
     return;
 
   showScoreDelay = 5000;
-  showResult(GetScore(i));
-  setLed(i+1);
-  i++;
-  if (i > 3)
-    i = 0;
-  showScoreTime = millis();
+  showResult(GetScore(highScoreIndex));
+  setLed(highScoreIndex+1);
+  highScoreIndex++;
+  if (highScoreIndex > 3)
+    highScoreIndex = 0;
+  millisTimer = millis();
 }
 
 void initializeTimer(bool on)
@@ -108,69 +106,71 @@ void initializeTimer(bool on)
 ISR(TIMER1_COMPA_vect)
 {
   gameTimerReady = true;
+
+  OCR1A = max(12500, (62499 - gameIndex * timerReduction));
 }
 
 void LoseGame(){
   gameRunning = false;
   buttonPressed = -1;
-  i = 0;
-
+  highScoreIndex = 0;
   Serial.println("Game lost!");
   clearAllLeds();
   initializeTimer(false);
  
   GameOverSound();
- 
   
   if (CheckIfTopScore(currentScore))
-  {
     show2();
-  }
+
 }
 
-void PrepareNew(){
-  randomizedTarget = random(1,5);
-  Serial.println(randomizedTarget);
-  setLed(randomizedTarget);
-  LedPopSound(currentScore);
-  gameTimerReady = false;
-  doFail = true;
+void PrepareNew()
+{
+  clearAllLeds();
+  Serial.println(targetLeds[gameIndex]);
+  setLed(targetLeds[gameIndex]);
+  LedPopSound(gameIndex);
   
-  buttonPressed = -1;
-  canPress = true;
+  gameIndex++;
+  gameTimerReady = false;
 }
 
 void checkGame(byte buttonNum)
 { 
   Serial.print("Check Game: ");
-  clearAllLeds();
-  if (buttonNum == randomizedTarget)
+  
+  if (buttonNum == targetLeds[playerIndex])
   {
     Serial.println("Correct!");
     currentScore++;
     showResult(currentScore);
-
-    doFail = false;
-    OCR1A = max(12500, (62499 - currentScore * timerScoreReduction));
   }
   else{
     Serial.println("Wrong!");
     LoseGame();
   }
 
+  millisTimer = millis();
   buttonPressed = -1;
-  canPress = false;
 }
 
 void initializeGame()
 {
-  canPress = false;
-
   gameTimerReady = false;
   currentScore = 0;
+  gameIndex = 0;
+  playerIndex = 0;
   buttonPressed = -1;
+
+  millisTimer = millis();
   randomSeed(millis());
  
+  for(int i = 0; i < 100; i++)
+  {
+    targetLeds[i] = random(1,5);
+  }
+
   initializeTimer(true);
   PrepareNew();
 }
@@ -181,9 +181,9 @@ void startTheGame()
   showResult(0);
   GameStartSound();
   gameRunning = true;
+
   delay(1000);
 
   Serial.println("Game started!");
   initializeGame();
 }
-
