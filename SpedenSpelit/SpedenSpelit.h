@@ -20,11 +20,11 @@ void checkGame(byte);
 void startTheGame(void);
 
 // Prepares a new 1-4 led 
-void PrepareNew()
+void PrepareNew();
 
 // Stop the game, and check if the score is in the top 4. Play a jingle if true
-void LoseGame()
+void LoseGame();
 
 //  Shows the top 4 scores in descending order
-void ShowHighScore()
+void ShowHighScore();
 #endif

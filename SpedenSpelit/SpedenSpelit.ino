@@ -143,6 +143,9 @@ void PrepareNew(){
 void checkGame(byte buttonNum)
 { 
   Serial.print("Check Game: ");
+  Serial.print(buttonNum);
+  Serial.print(" - ");
+
   clearAllLeds();
   if (buttonNum == randomizedTarget)
   {
@@ -169,7 +172,7 @@ void initializeGame()
   gameTimerReady = false;
   currentScore = 0;
   buttonPressed = -1;
-  randomSeed(millis());
+  randomSeed(3);
  
   initializeTimer(true);
   PrepareNew();
