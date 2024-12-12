@@ -35,6 +35,11 @@ void setup()
 
 void loop()
 {
+  while(true){
+    for(int i = 0; i < 10; i++){
+      writeHighAndLowNumber(i,i);
+    }
+  }
   if(gameRunning)
   {
 
@@ -68,6 +73,7 @@ void ShowHighScore()
 
   showScoreDelay = 5000;
   showResult(GetScore(i));
+
   setLed(i+1);
   i++;
   if (i > 3)

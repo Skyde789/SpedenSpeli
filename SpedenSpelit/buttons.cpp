@@ -40,19 +40,23 @@ ISR(PCINT2_vect) {
   if(canPress == false && gameRunning)
     return;
     
-    for(int i = 2;i<7;i++)
+  if (gameRunning){
+    for(int i = 2;i<6;i++)
     {
-        byte luettu = digitalRead(i);
-        
-  
-        if(luettu==LOW)
-        {
-            buttonPressed = convert(i);
+      byte luettu = digitalRead(i);
+      //Serial.print("Button: ");
+      //Serial.print(convert(i));
+      //Serial.println(luettu==HIGH ? " True " : " False ");
+      if(luettu==HIGH)
+      {
+        buttonPressed = convert(i);
             
-            if(gameRunning)
-              canPress = false;
-        }
-        
+        if(gameRunning)
+          canPress = false;
+      }
     }  
-   
+  }
+  else
+    if (digitalRead(6) == LOW)
+      buttonPressed = 5;
 }
