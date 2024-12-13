@@ -35,14 +35,8 @@ void setup()
 
 void loop()
 {
-  while(true){
-    for(int i = 0; i < 10; i++){
-      writeHighAndLowNumber(i,i);
-    }
-  }
   if(gameRunning)
   {
-
     if(buttonPressed>=1 && buttonPressed <= 4)
       checkGame(buttonPressed);
 

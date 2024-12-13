@@ -9,7 +9,6 @@ const int dataPin2 = 11;
 const int clockPin2 = 12;   
 const int latchPin2 = 13;   
 
-// Valmis taulukko binääriluvuista, joka auttaa piiriä näyttämään oikean luvun (esim. "digitPatterns[3]" näyttäisi 3)
 const byte digitPatterns[10] = {
   0b00111111, // 0
   0b00000110, // 1
@@ -24,18 +23,40 @@ const byte digitPatterns[10] = {
 };
 
 /*
-  Laittaa tarvittavat pinnit OUTPUT tilaan
+  initializeDisplay subroutine initializes 5 pins needed for controlling 7-segment
+  displays in a cascade as follows:
+  Arduino pin 12 = serial to parallel component reset
+  Arduino pin 11 = serial to parallel component shiftClock
+  Arduino pin 10 = serial to parallel component latchClock
+  Arduino pin 9  = serial to parallel component outEnable
+  Arduino pin 8  = serial to parallel component serialInput
+  
+
 */
 void initializeDisplay(void);
 
+
 /*
-Näyttää kahdessa displayssä kympit ja ykköset
-Saa parametrinä kympit ja ykköset erikseen
+  writeHighAndLowNumber subroutine writes a number 0,1,..,99
+  to 2 cascaded 7-segment displays. This subroutine uses
+  WriteByte subroutine to write 2 numbers to the display.
+  
+  Parameters:
+  
+  uint8_t tens: number 0,1,..,9
+  uint8_t ones: number 0,1,..,9
+  
 */
 void writeHighAndLowNumber(uint8_t tens,uint8_t ones);
 
+
 /*
-  Eroittaa kympit ja ykköset luvusta ja kutsuu writeHighAndLowNumber funktion eroitetuilla luvuilla
+  showResuts(byte result) This function separates tens and ones
+  from a result number and calls writeHighAndLowNumber subroutine
+  to actually write the number to 7-segment display.
+  
+  Parameters:
+  byte result: A number between 0,1,..,99. This function
 */
 void showResult(byte result);
 
